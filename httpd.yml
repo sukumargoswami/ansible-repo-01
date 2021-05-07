@@ -1,0 +1,37 @@
+---
+- name: install apache web server 
+  hosts: all
+  remote_user: opc
+  become: true
+  become_method: sudo
+  become_user: root
+  
+
+  tasks:
+  - name: install httpd
+    yum:
+      name: httpd
+      state: latest
+
+  - name: start and enable httpd
+    service:
+      name: httpd
+      state: started
+      enabled: true
+
+  - name: enable firewall
+    firewalld: 
+      zone: public
+      service: http
+      permanent: yes
+      state: enabled
+
+  - name: reload firewall service
+    service:
+      name: firewalld
+      state: restarted
+  
+  - name: create index.html file
+    template:
+      src: index.html
+      dest: /var/www/html/index.html 
